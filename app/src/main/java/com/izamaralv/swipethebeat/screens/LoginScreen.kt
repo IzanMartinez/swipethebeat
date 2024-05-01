@@ -1,5 +1,6 @@
 package com.izamaralv.swipethebeat.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,11 +18,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,21 +33,37 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.izamaralv.swipethebeat.common.backgroundColor
 import com.izamaralv.swipethebeat.common.hardComponentColor
-import com.izamaralv.swipethebeat.common.textColor
 import com.izamaralv.swipethebeat.common.softComponentColor
+import com.izamaralv.swipethebeat.common.textColor
+import com.izamaralv.swipethebeat.exceptions.InvalidEmailException
+import com.izamaralv.swipethebeat.exceptions.InvalidPasswordException
+import com.izamaralv.swipethebeat.exceptions.LoginFailedException
 import com.izamaralv.swipethebeat.exceptions.RequiredFieldsAreEmptyException
+import com.izamaralv.swipethebeat.utils.CustomAuthDialog
+import com.izamaralv.swipethebeat.utils.isValidEmail
+import com.izamaralv.swipethebeat.utils.isValidPassword
+import com.izamaralv.swipethebeat.utils.loginAccount
+import kotlinx.coroutines.launch
 
-@Preview
 @Composable
-fun LoginScreen() {
+fun LoginScreen(navController: NavController) {
+
+    // initialization
+    val coroutineScope = rememberCoroutineScope()
 
 
-    var userEmail by remember { mutableStateOf("") }
-    var userPassword by remember { mutableStateOf("") }
-    var userPasswordAgain by remember { mutableStateOf("") }
+    // variables
+    val userEmail = remember { mutableStateOf("") }
+    val userPassword = remember { mutableStateOf("") }
 
+    // dialogs
+    val requiredFieldsAreEmptyDialog = remember { mutableStateOf(false) }
+    val invalidEmailDialog = remember { mutableStateOf(false) }
+    val invalidPasswordDialog = remember { mutableStateOf(false) }
+    val loginFailedDialog = remember { mutableStateOf(false) }
     // background
     Column(
         modifier = Modifier
@@ -71,8 +86,8 @@ fun LoginScreen() {
             // title box
             Box(
                 modifier = Modifier.background(
-                        color = Color.White.copy(alpha = .5f), shape = RoundedCornerShape(8.dp)
-                    )
+                    color = Color.White.copy(alpha = .5f), shape = RoundedCornerShape(8.dp)
+                )
 //                .fillMaxHeight(.5f)
             ) {
                 Text(
@@ -98,12 +113,12 @@ fun LoginScreen() {
     ) {
 
         // email label
-        Text(text = "Enter your email", fontSize = 25.sp, color = textColor.copy(alpha = .8f))
+        Text(text = "Introduce tu email", fontSize = 25.sp, color = textColor.copy(alpha = .8f))
 
         // email text field
         BasicTextField(
-            value = userEmail,
-            onValueChange = { userEmail = it },
+            value = userEmail.value,
+            onValueChange = { userEmail.value = it },
             modifier = Modifier
                 .height(80.dp)
                 .fillMaxWidth(.8f)
@@ -115,10 +130,9 @@ fun LoginScreen() {
             textStyle = TextStyle(fontSize = 20.sp, color = Color.Black),
         )
 
-
         // password label
         Text(
-            text = "Enter your password",
+            text = "Introduce tu contraseña",
             fontSize = 25.sp,
             color = textColor.copy(alpha = .8f),
             modifier = Modifier.padding(top = 40.dp)
@@ -126,8 +140,8 @@ fun LoginScreen() {
 
         // password text field
         BasicTextField(
-            value = userPassword,
-            onValueChange = { userPassword = it },
+            value = userPassword.value,
+            onValueChange = { userPassword.value = it },
             modifier = Modifier
                 .height(80.dp)
                 .fillMaxWidth(.8f)
@@ -138,6 +152,7 @@ fun LoginScreen() {
             textStyle = TextStyle(fontSize = 20.sp, color = Color.Black),
             visualTransformation = PasswordVisualTransformation()
         )
+
     }
 
     // login column
@@ -151,17 +166,53 @@ fun LoginScreen() {
     ) {
 
 
-        Button(colors = ButtonDefaults.buttonColors(hardComponentColor),
+        Button(
+            colors = ButtonDefaults.buttonColors(hardComponentColor),
             modifier = Modifier
                 .fillMaxWidth(.5f)
                 .height(55.dp)
                 .background(color = hardComponentColor, shape = RoundedCornerShape(8.dp)),
             onClick = {
-                if (userEmail.isBlank() || userPassword.isBlank()) {
-                    throw RequiredFieldsAreEmptyException()
-                }/* TODO: add ViewModel logic here */
-            }) {
-            Text("LOGIN")
+                try {
+                    if (userEmail.value.isBlank() || userPassword.value.isBlank())
+                        throw RequiredFieldsAreEmptyException()
+
+                    if (!isValidEmail(email = userEmail.value))
+                        throw InvalidEmailException()
+
+                    if (!isValidPassword(password = userPassword.value))
+                        throw InvalidPasswordException()
+
+                    coroutineScope.launch {
+                        // Attempt to sign in the user
+                        val success = loginAccount(
+                            email = userEmail.value,
+                            password = userPassword.value
+                        )
+
+                        if (!success)
+                            throw LoginFailedException()
+
+                        // Navigate to main screen if login is successful
+                        navController.navigate("main")
+                        Log.d("SignIn", "Signed in correctly")
+                    }
+                } catch (e: RequiredFieldsAreEmptyException) {
+                    Log.d("SignIn", "Fields are empty")
+                    requiredFieldsAreEmptyDialog.value = true
+                } catch (e: InvalidEmailException) {
+                    Log.d("SignIn", "Incorrect email")
+                    invalidEmailDialog.value = true
+                } catch (e: InvalidPasswordException) {
+                    Log.d("SignIn", "Incorrect password")
+                    invalidPasswordDialog.value = true
+                } catch (e: LoginFailedException) {
+                    Log.d("SignIn", "Login failed")
+                    loginFailedDialog.value = true
+                }
+            }
+        ) {
+            Text("INICIAR SESIÓN")
         }
 
 
@@ -169,12 +220,52 @@ fun LoginScreen() {
         Spacer(modifier = Modifier.height(50.dp))
 
         ClickableText(
+            modifier = Modifier.fillMaxHeight(.1f),
             text = AnnotatedString("New here? Create an account"),
-            onClick = { /* TODO: add navController*/ },
+            onClick = { navController.navigate("register") },
             style = TextStyle(
                 textDecoration = TextDecoration.Underline, color = textColor
             )
         )
+    }
+
+
+    // dialog management
+    if (requiredFieldsAreEmptyDialog.value) {
+        CustomAuthDialog(
+            title = "Faltan campos",
+            message = "Debes rellenar todos los campos para continuar. "
+        ) {
+            requiredFieldsAreEmptyDialog.value = false
+        }
+    }
+    if (invalidEmailDialog.value) {
+        CustomAuthDialog(
+            title = "Email inválido",
+            message = "Por favor, introduce un email válido. ",
+            variable1 = userEmail,
+            variable2 = userPassword,
+        ) {
+            invalidEmailDialog.value = false
+        }
+    }
+    if (invalidPasswordDialog.value) {
+        CustomAuthDialog(
+            title = "Contraseña inválida",
+            message = "Por favor, introduce una contraseña válida. ",
+            variable1 = userPassword,
+        ) {
+            invalidPasswordDialog.value = false
+        }
+    }
+    if (loginFailedDialog.value) {
+        CustomAuthDialog(
+            title = "Credenciales incorrectas",
+            message = "No existe ninguna cuenta con esas credenciales",
+            variable1 = userPassword
+        ) {
+
+        }
     }
 
 }

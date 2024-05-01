@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,36 +32,38 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.izamaralv.swipethebeat.common.backgroundColor
 import com.izamaralv.swipethebeat.common.hardComponentColor
-import com.izamaralv.swipethebeat.common.textColor
 import com.izamaralv.swipethebeat.common.softComponentColor
+import com.izamaralv.swipethebeat.common.textColor
 import com.izamaralv.swipethebeat.exceptions.EmailAlreadyRegisteredException
 import com.izamaralv.swipethebeat.exceptions.InvalidEmailException
 import com.izamaralv.swipethebeat.exceptions.InvalidPasswordException
 import com.izamaralv.swipethebeat.exceptions.PasswordMatchErrorException
 import com.izamaralv.swipethebeat.exceptions.RequiredFieldsAreEmptyException
 import com.izamaralv.swipethebeat.utils.CustomAuthDialog
+import com.izamaralv.swipethebeat.utils.createAccount
 import com.izamaralv.swipethebeat.utils.isValidEmail
 import com.izamaralv.swipethebeat.utils.isValidPassword
-import com.izamaralv.swipethebeat.utils.createAccount
 import kotlinx.coroutines.launch
 
-@Preview
 @Composable
-fun SignInScreen() {
+fun RegisterScreen(navController: NavController) {
 
     // initialization
     val coroutineScope = rememberCoroutineScope()
+
 
     // variables
     val userEmail = remember { mutableStateOf("") }
     val userPassword = remember { mutableStateOf("") }
     val userPasswordAgain = remember { mutableStateOf("") }
     val isEmailNew = remember { mutableStateOf(false) }
+    val isPasswordShown = remember { mutableStateOf(false) }
+    val isPasswordAgainShown = remember { mutableStateOf(false) }
 
     // dialogs
     val requiredFieldsAreEmptyDialog = remember { mutableStateOf(false) }
@@ -144,21 +147,24 @@ fun SignInScreen() {
             modifier = Modifier.padding(top = 40.dp)
         )
 
-        // password text field
-        BasicTextField(
-            value = userPassword.value,
-            onValueChange = { userPassword.value = it },
-            modifier = Modifier
-                .height(80.dp)
-                .fillMaxWidth(.8f)
-                .padding(start = 10.dp, top = 30.dp, end = 10.dp)
-                .background(color = softComponentColor, shape = RoundedCornerShape(8.dp))
-                .padding(vertical = 15.dp, horizontal = 15.dp),
-            singleLine = true,
-            textStyle = TextStyle(fontSize = 20.sp, color = Color.Black),
-            visualTransformation = PasswordVisualTransformation()
-        )
+        Row {
+            // password text field
+            BasicTextField(
+                value = userPassword.value,
+                onValueChange = { userPassword.value = it },
+                modifier = Modifier
+                    .height(80.dp)
+                    .fillMaxWidth(.8f)
+                    .padding(start = 10.dp, top = 30.dp, end = 10.dp)
+                    .background(color = softComponentColor, shape = RoundedCornerShape(8.dp))
+                    .padding(vertical = 15.dp, horizontal = 15.dp),
+                singleLine = true,
+                textStyle = TextStyle(fontSize = 20.sp, color = Color.Black),
+                visualTransformation = PasswordVisualTransformation()
+            )
 
+
+        }
         // password label
         Text(
             text = "Repite la contraseña",
@@ -187,7 +193,7 @@ fun SignInScreen() {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .fillMaxHeight(.95f)
+            .fillMaxHeight()
             .fillMaxWidth(),
 
         verticalArrangement = Arrangement.Bottom
@@ -235,10 +241,10 @@ fun SignInScreen() {
                     emailAlreadyRegisteredDialog.value = true
                 }
 
+                navController.navigate("main")
 
-                /* TODO: add ViewModel logic here */
             }) {
-            Text("CREATE ACCOUNT")
+            Text(text = "CREAR CUENTA", color = textColor)
         }
 
 
@@ -246,13 +252,15 @@ fun SignInScreen() {
         Spacer(modifier = Modifier.height(30.dp))
 
         ClickableText(
+            modifier = Modifier.fillMaxHeight(.1f),
             text = AnnotatedString("Already have an account? Login"),
-            onClick = { /* TODO: add navController*/ },
+            onClick = { navController.navigate("login") },
             style = TextStyle(
                 textDecoration = TextDecoration.Underline, color = textColor
             )
         )
     }
+
 
     // dialog management
     if (requiredFieldsAreEmptyDialog.value) {

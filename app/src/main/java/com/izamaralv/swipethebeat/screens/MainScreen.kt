@@ -4,13 +4,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
 import com.alexstyl.swipeablecard.ExperimentalSwipeableCardApi
 import com.alexstyl.swipeablecard.rememberSwipeableCardState
 import com.alexstyl.swipeablecard.swipableCard
 
 @OptIn(ExperimentalSwipeableCardApi::class)
 @Composable
-fun MainScreen(){
+fun MainScreen(navController: NavController) {
     val state = rememberSwipeableCardState()
 
     Box(

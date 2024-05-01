@@ -1,5 +1,3 @@
-import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
-
 plugins {
     id("com.android.application")
     id("com.google.gms.google-services")
@@ -69,6 +67,9 @@ dependencies {
         exclude(group = "xpp3")
     }
 
+    implementation("androidx.navigation:navigation-compose:2.7.7")
+
+
     implementation("androidx.activity:activity-compose:1.8.2") {
         exclude(group = "xmlpull")
         exclude(group = "xpp3")
@@ -102,6 +103,9 @@ dependencies {
         exclude(group = "xmlpull")
         exclude(group = "xpp3")
     }
+    implementation("androidx.compose.material:material-icons-core:1.6.6")
+    implementation("androidx.compose.material:material-icons-extended:1.6.6") // Replace x.x.x with the version
+
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
@@ -122,6 +126,6 @@ dependencies {
         exclude(group = "xpp3")
     }
 
-    implementation ("com.alexstyl.swipeablecard:swipeablecard:0.1.0")
+    implementation("com.alexstyl.swipeablecard:swipeablecard:0.1.0")
 
 }
