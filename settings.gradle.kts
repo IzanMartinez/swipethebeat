@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "SwipeTheBeat"
 include(":app")
+include(":app:core")

@@ -11,5 +11,5 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 val AquaBackground = Color(0xFF21897E)
-val AquaComponent = Color(0xFF3BA99C)
-val AquaField = Color(0xFFA1E2DB)
+val AquaDarkComponent = Color(0xFF3BA99C)
+val AquaLightComponent = Color(0xFF76C3BA)

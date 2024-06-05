@@ -56,11 +56,15 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.google.firebase:firebase-storage-ktx")
 
     implementation("androidx.core:core-ktx:1.12.0") {
         exclude(group = "xmlpull")
         exclude(group = "xpp3")
     }
+
+    implementation("io.coil-kt:coil-compose:2.6.0")
 
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0") {
         exclude(group = "xmlpull")
@@ -104,7 +108,10 @@ dependencies {
         exclude(group = "xpp3")
     }
     implementation("androidx.compose.material:material-icons-core:1.6.6")
-    implementation("androidx.compose.material:material-icons-extended:1.6.6") // Replace x.x.x with the version
+    implementation("androidx.compose.material:material-icons-extended:1.6.6")
+    implementation("com.google.firebase:firebase-auth:23.0.0")
+    implementation("com.google.firebase:firebase-firestore:25.0.0")
+    implementation("com.google.firebase:firebase-storage:21.0.0")
 
 
     testImplementation("junit:junit:4.13.2")
