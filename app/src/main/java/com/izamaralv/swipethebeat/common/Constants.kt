@@ -15,7 +15,9 @@ object Constants {
     private val likeList = mutableListOf<Song>()
     private val dislikeList = mutableListOf<Song>()
     private val displayList = mutableListOf<Song>()
-    private val dataViewModel = DataViewModel()
+    private val dataViewModel: DataViewModel by lazy {
+        DataViewModel()
+    }
 
     fun getLikeList(): List<Song> {
         return likeList.toList()
@@ -42,5 +44,18 @@ object Constants {
     fun deleteSongDisplayList(song: Song) {
         displayList.remove(song)
     }
+    fun clearLikeList() {
+        likeList.clear()
+    }
+    fun clearDislikeList() {
+        dislikeList.clear()
+    }
+
+    fun resetLists() {
+        clearLikeList()
+        clearDislikeList()
+        populateDisplayList()
+    }
+
 
 }

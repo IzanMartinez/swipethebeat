@@ -6,15 +6,20 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.izamaralv.swipethebeat.common.backgroundColor
+import com.izamaralv.swipethebeat.common.colorName
 import com.izamaralv.swipethebeat.common.contentColor
 import com.izamaralv.swipethebeat.common.darkComponentColor
+import com.izamaralv.swipethebeat.common.lightComponentColor
 
 @Composable
 fun CustomDismissDialog(
+
+
     title: String,
     message: String,
     variable1: MutableState<String>? = null,
@@ -23,6 +28,13 @@ fun CustomDismissDialog(
     onDismissRequest: () -> Unit
 
 ) {
+    // colors
+    val backgroundColor by backgroundColor
+    val darkComponentColor by darkComponentColor
+    val lightComponentColor by lightComponentColor
+    val contentColor by contentColor
+    val colorName by colorName
+
     AlertDialog(
         onDismissRequest = {
             // Reset the variables to empty strings before dismissing the dialog

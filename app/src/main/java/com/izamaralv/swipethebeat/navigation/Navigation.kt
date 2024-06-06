@@ -4,14 +4,14 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.izamaralv.swipethebeat.screens.credentials.LoginScreen
 import com.izamaralv.swipethebeat.screens.MainScreen
-import com.izamaralv.swipethebeat.screens.credentials.RegisterScreen
 import com.izamaralv.swipethebeat.screens.SettingsScreen
+import com.izamaralv.swipethebeat.screens.credentials.LoginScreen
+import com.izamaralv.swipethebeat.screens.credentials.RegisterScreen
 
 @Composable
 fun Navigation(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = Screen.HomeScreen.route) {
+    NavHost(navController = navController, startDestination = Screen.SettingsScreen.route) {
         composable(Screen.LoginScreen.route) {
             LoginScreen(navController)
         }

@@ -16,6 +16,7 @@ class DataViewModel : ViewModel() {
 
     init {
         getData()
+
     }
     private fun getData() {
         viewModelScope.launch {

@@ -17,16 +17,16 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = AquaDarkComponent,
-    secondary = AquaDarkComponent,
-    tertiary = AquaBackground,
-    background = AquaBackground
+    primary = GreenDarkComponent,
+    secondary = GreenDarkComponent,
+    tertiary = GreenBackground,
+    background = GreenBackground
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = AquaDarkComponent,
-    secondary = AquaLightComponent,
-    tertiary = AquaDarkComponent,
+    primary = GreenDarkComponent,
+    secondary = GreenLightComponent,
+    tertiary = GreenDarkComponent,
 
     /* Other default colors to override
     surface = Color(0xFFFFFBFE),

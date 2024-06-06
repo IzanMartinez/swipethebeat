@@ -50,6 +50,7 @@ import com.izamaralv.swipethebeat.common.Constants.deleteSongDisplayList
 import com.izamaralv.swipethebeat.common.Constants.getDisplayList
 import com.izamaralv.swipethebeat.common.Constants.populateDisplayList
 import com.izamaralv.swipethebeat.common.backgroundColor
+import com.izamaralv.swipethebeat.common.colorName
 import com.izamaralv.swipethebeat.common.contentColor
 import com.izamaralv.swipethebeat.common.darkComponentColor
 import com.izamaralv.swipethebeat.common.lightComponentColor
@@ -64,7 +65,16 @@ import com.izamaralv.swipethebeat.utils.navigateToUrl
 import kotlinx.coroutines.launch
 
 @Composable
-fun MainScreen(navController: NavController, dataViewModel: DataViewModel = viewModel()) {
+fun MainScreen(
+    navController: NavController,
+    dataViewModel: DataViewModel = viewModel()
+) {
+    // colors
+    val backgroundColor by backgroundColor
+    val darkComponentColor by darkComponentColor
+    val lightComponentColor by lightComponentColor
+    val contentColor by contentColor
+    val colorName by colorName
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -98,7 +108,7 @@ fun MainScreen(navController: NavController, dataViewModel: DataViewModel = view
             ModalNavigationDrawer(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(darkComponentColor),
+                    .background(backgroundColor),
                 drawerContent = {
 
                     CustomDrawerSheet(
@@ -168,10 +178,17 @@ fun MainScreen(navController: NavController, dataViewModel: DataViewModel = view
                         painter = rememberAsyncImagePainter(model = currentSong.value?.imagen),
                         modifier = Modifier
                             .size(300.dp)
-                            .clickable { currentSong.value?.link?.let { navigateToUrl(context, it) } },
+                            .clickable {
+                                currentSong.value?.link?.let {
+                                    navigateToUrl(
+                                        context,
+                                        it
+                                    )
+                                }
+                            },
                         contentDescription = "Portada del álbum",
 
-                    )
+                        )
                     Text(
                         text = "\n" + currentSong.value?.nombre,
                         fontSize = 35.sp,
@@ -285,15 +302,14 @@ fun MainScreen(navController: NavController, dataViewModel: DataViewModel = view
             titleContentColor = contentColor,
             onDismissRequest = { /* do nothing */ },
             confirmButton = {
-                /*TODO*/
                 TextButton(
-                    onClick = { /*TODO*/ },
+                    onClick = { navController.navigate(Screen.SettingsScreen.route) },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = lightComponentColor,
                         contentColor = contentColor
                     )
                 ) {
-                    Text(text = "Listas")
+                    Text(text = "Ajustes")
 
                 }
             },
