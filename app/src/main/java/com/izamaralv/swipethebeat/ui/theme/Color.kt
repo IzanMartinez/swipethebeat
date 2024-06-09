@@ -45,6 +45,20 @@ val YellowLightComponent = Color(0xFFF7D978)
 val YellowContent = Color(0xFFFFFFFF)
 const val YellowName = "Amarillo"
 
+// purple
+val PurpleBackground = Color(0xFF7F5BAA)
+val PurpleDarkComponent = Color(0xFF5A3D8F)
+val PurpleLightComponent = Color(0xFF9F8FE5)
+val PurpleContent = Color(0xFFFFFFFF)
+const val PurpleName = "Morado"
+
+// pink
+val PinkBackground = Color(0xFFEB8383)
+val PinkDarkComponent = Color(0xFFA93434)
+val PinkLightComponent = Color(0xFFEB8383)
+val PinkContent = Color(0xFFFFFFFF)
+const val PinkName = "Rosa"
+
 // light
 val LightBackground = Color(0xFFFFFFFF)
 val LightDarkComponent = Color(0xFFD8D8D7)

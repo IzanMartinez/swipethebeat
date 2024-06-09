@@ -2,6 +2,8 @@ package com.izamaralv.swipethebeat.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.DrawerState
@@ -35,7 +37,6 @@ fun CustomDrawerSheet(
     backgroundColor: Color
 ) {
     // colors
-//    val backgroundColor by backgroundColor
     val darkComponentColor by darkComponentColor
     val lightComponentColor by lightComponentColor
     val contentColor by contentColor
@@ -50,28 +51,85 @@ fun CustomDrawerSheet(
                 .fillMaxSize()
                 .background(backgroundColor)
         ) {
-            // item pantalla principal
-            NavigationDrawerItem(
-                icon = {
-                    Icon(
-                        imageVector = Screen.HomeScreen.icon, // Use the main screen icon
-                        contentDescription = null,
-                        modifier = Modifier.size(24.dp)
+            Column {
+                Spacer(modifier = Modifier.size(20.dp))
+                // item pantalla principal
+                NavigationDrawerItem(
+                    icon = {
+                        Icon(
+                            imageVector = Screen.HomeScreen.icon, // Use the main screen icon
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
+                    label = { Text(text = "Inicio", color = contentColor) },
+                    selected = SCREENS[0] == selectedScreen.value,
+                    onClick = {
+                        // Navigate to Main Screen
+                        navController.navigate(Screen.HomeScreen.route)
+                        scope.launch { drawerState.close() } // Close drawer after navigation
+                        selectedScreen.value = SCREENS[0] // Update selected screen
+                    },
+                    colors = NavigationDrawerItemDefaults.colors(
+                        selectedContainerColor = darkComponentColor,
+                        unselectedContainerColor = darkComponentColor
                     )
-                },
-                label = { Text(text = "Inicio", color = contentColor) },
-                selected = SCREENS[0] == selectedScreen.value, // (optional) highlight if needed
-                onClick = {
-                    // Navigate to Main Screen
-                    navController.navigate(Screen.HomeScreen.route)
-                    scope.launch { drawerState.close() } // Close drawer after navigation
-
-                },
-                colors = NavigationDrawerItemDefaults.colors(
-                    selectedContainerColor = darkComponentColor,
-                    unselectedContainerColor = darkComponentColor
                 )
-            )
+
+                Spacer(modifier = Modifier.size(20.dp))
+
+                // item pantalla de listas
+                NavigationDrawerItem(
+                    icon = {
+                        Icon(
+                            imageVector = Screen.ListsScreen.icon, // Use an appropriate icon for profile
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
+                    label = { Text(text = "Tus Listas", color = contentColor) },
+                    selected = SCREENS[0] == selectedScreen.value,
+                    onClick = {
+                        // Navigate to Profile Screen
+                        navController.navigate(Screen.ListsScreen.route)
+                        scope.launch { drawerState.close() } // Close drawer after navigation
+                        selectedScreen.value = SCREENS[0] // Update selected screen
+                    },
+                    colors = NavigationDrawerItemDefaults.colors(
+                        selectedContainerColor = darkComponentColor,
+                        unselectedContainerColor = darkComponentColor
+                    )
+                )
+
+                Spacer(modifier = Modifier.size(20.dp))
+
+                // item pantalla de perfil
+                NavigationDrawerItem(
+                    icon = {
+                        Icon(
+                            imageVector = Screen.ProfileScreen.icon, // Use an appropriate icon for profile
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
+                    label = { Text(text = "Perfil", color = contentColor) },
+                    selected = SCREENS[0] == selectedScreen.value,
+                    onClick = {
+                        // Navigate to Profile Screen
+                        navController.navigate(Screen.ProfileScreen.route)
+                        scope.launch { drawerState.close() } // Close drawer after navigation
+                        selectedScreen.value = SCREENS[0] // Update selected screen
+                    },
+                    colors = NavigationDrawerItemDefaults.colors(
+                        selectedContainerColor = darkComponentColor,
+                        unselectedContainerColor = darkComponentColor
+                    )
+                )
+
+                Spacer(modifier = Modifier.size(20.dp))
+
+
+            }
         }
     }
 }

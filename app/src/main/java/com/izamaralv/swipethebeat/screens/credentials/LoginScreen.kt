@@ -3,7 +3,6 @@ package com.izamaralv.swipethebeat.screens.credentials
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -24,13 +23,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,6 +36,7 @@ import com.izamaralv.swipethebeat.common.contentColor
 import com.izamaralv.swipethebeat.common.darkComponentColor
 import com.izamaralv.swipethebeat.common.lightComponentColor
 import com.izamaralv.swipethebeat.components.CustomDismissDialog
+import com.izamaralv.swipethebeat.components.CustomLogo
 import com.izamaralv.swipethebeat.exceptions.InvalidEmailException
 import com.izamaralv.swipethebeat.exceptions.InvalidPasswordException
 import com.izamaralv.swipethebeat.exceptions.LoginFailedException
@@ -82,193 +78,160 @@ fun LoginScreen(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
-
-        // title column
+        // data column
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(.3f),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
+                .fillMaxHeight(),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(60.dp))
+            CustomLogo()
+            Spacer(modifier = Modifier.height(50.dp))
 
-            // title box
-            Box(
-                modifier = Modifier.background(
-                    color = Color.White.copy(alpha = .5f), shape = RoundedCornerShape(8.dp)
-                )
-            ) {
-                Text(
-                    text = " S W I P E \n\n T H E \n\n B E A T ",
-                    fontSize = 40.sp,
-                    fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = contentColor,
-                    modifier = Modifier.padding(20.dp),
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-    }
-
-    // data column
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-
-        // email label
-        Text(text = "Introduce tu email", fontSize = 25.sp, color = contentColor.copy(alpha = .8f))
-
-        // email text field
-        BasicTextField(
-            value = userEmail.value,
-            onValueChange = { userEmail.value = it },
-            modifier = Modifier
-                .height(80.dp)
-                .fillMaxWidth(.8f)
-                .padding(start = 10.dp, top = 30.dp, end = 10.dp)
-                .background(color = lightComponentColor, shape = RoundedCornerShape(8.dp))
-                .padding(vertical = 13.dp, horizontal = 15.dp),
-
-            singleLine = true,
-            textStyle = TextStyle(fontSize = 20.sp, color = contentColor),
-        )
-
-        // password label
-        Text(
-            text = "Introduce tu contraseña",
-            fontSize = 25.sp,
-            color = contentColor.copy(alpha = .8f),
-            modifier = Modifier.padding(top = 40.dp)
-        )
-
-        // password text field
-        BasicTextField(
-            value = userPassword.value,
-            onValueChange = { userPassword.value = it },
-            modifier = Modifier
-                .height(80.dp)
-                .fillMaxWidth(.8f)
-                .padding(start = 10.dp, top = 30.dp, end = 10.dp)
-                .background(color = lightComponentColor, shape = RoundedCornerShape(8.dp))
-                .padding(vertical = 15.dp, horizontal = 15.dp),
-            singleLine = true,
-            textStyle = TextStyle(fontSize = 20.sp, color = contentColor),
-            visualTransformation = PasswordVisualTransformation()
-        )
-
-    }
-
-    // login column
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxHeight(.86f)
-            .fillMaxWidth(),
-
-        verticalArrangement = Arrangement.Bottom
-    ) {
-
-
-        Button(
-            colors = ButtonDefaults.buttonColors(darkComponentColor),
-            modifier = Modifier
-                .fillMaxWidth(.5f)
-                .height(55.dp)
-                .background(color = darkComponentColor, shape = RoundedCornerShape(8.dp)),
-            onClick = {
-                try {
-                    if (userEmail.value.isBlank() || userPassword.value.isBlank())
-                        throw RequiredFieldsAreEmptyException()
-
-                    if (!isValidEmail(email = userEmail.value))
-                        throw InvalidEmailException()
-
-                    if (!isValidPassword(password = userPassword.value))
-                        throw InvalidPasswordException()
-
-                    coroutineScope.launch {
-                        // Attempt to sign in the user
-                        val success = loginAccount(
-                            email = userEmail.value,
-                            password = userPassword.value
-                        )
-
-                        try {
-                            if (!success) {
-                                Log.d("FAILED", "logfailed")
-                                throw LoginFailedException()
-                            }
-                        } catch (e: Exception) {
-                            Log.d("Login", "Login failed")
-                            loginFailedDialog.value = true
-                        }
-
-                        // Navigate to main screen if login is successful
-                        navController.navigate(Screen.HomeScreen.route)
-                        Log.d("Login", "Logged in correctly")
-                    }
-                } catch (e: RequiredFieldsAreEmptyException) {
-                    Log.d("Login", "Fields are empty")
-                    requiredFieldsAreEmptyDialog.value = true
-                } catch (e: InvalidEmailException) {
-                    Log.d("Login", "Incorrect email")
-                    invalidEmailDialog.value = true
-                } catch (e: Exception) {
-                    Log.d("LOGIN", e.toString())
-                }
-            }
-        ) {
-            Text(text = "INICIAR SESIÓN", color = contentColor)
-        }
-
-
-
-        Spacer(modifier = Modifier.height(50.dp))
-
-        ClickableText(
-            modifier = Modifier.fillMaxHeight(.1f),
-            text = AnnotatedString("No tienes cuenta? Crea una aquí"),
-            onClick = { navController.navigate(Screen.RegisterScreen.route) },
-            style = TextStyle(
-                textDecoration = TextDecoration.Underline, color = contentColor
+            // email label
+            Text(
+                text = "Introduce tu email",
+                fontSize = 25.sp,
+                color = contentColor.copy(alpha = .8f)
             )
-        )
-    }
+
+            // email text field
+            BasicTextField(
+                value = userEmail.value,
+                onValueChange = { userEmail.value = it },
+                modifier = Modifier
+                    .height(80.dp)
+                    .fillMaxWidth(.8f)
+                    .padding(start = 10.dp, top = 30.dp, end = 10.dp)
+                    .background(color = lightComponentColor, shape = RoundedCornerShape(8.dp))
+                    .padding(vertical = 13.dp, horizontal = 15.dp),
+
+                singleLine = true,
+                textStyle = TextStyle(fontSize = 20.sp, color = contentColor),
+            )
+
+            // password label
+            Text(
+                text = "Introduce tu contraseña",
+                fontSize = 25.sp,
+                color = contentColor.copy(alpha = .8f),
+                modifier = Modifier.padding(top = 40.dp)
+            )
+
+            // password text field
+            BasicTextField(
+                value = userPassword.value,
+                onValueChange = { userPassword.value = it },
+                modifier = Modifier
+                    .height(80.dp)
+                    .fillMaxWidth(.8f)
+                    .padding(start = 10.dp, top = 30.dp, end = 10.dp)
+                    .background(color = lightComponentColor, shape = RoundedCornerShape(8.dp))
+                    .padding(vertical = 15.dp, horizontal = 15.dp),
+                singleLine = true,
+                textStyle = TextStyle(fontSize = 20.sp, color = contentColor),
+                visualTransformation = PasswordVisualTransformation()
+            )
+
+            Spacer(modifier = Modifier.height(70.dp))
+
+            Button(
+                colors = ButtonDefaults.buttonColors(darkComponentColor),
+                modifier = Modifier
+                    .fillMaxWidth(.5f)
+                    .height(55.dp)
+                    .background(color = darkComponentColor, shape = RoundedCornerShape(8.dp)),
+                onClick = {
+                    try {
+                        if (userEmail.value.isBlank() || userPassword.value.isBlank())
+                            throw RequiredFieldsAreEmptyException()
+
+                        if (!isValidEmail(email = userEmail.value))
+                            throw InvalidEmailException()
+
+                        if (!isValidPassword(password = userPassword.value))
+                            throw InvalidPasswordException()
+
+                        coroutineScope.launch {
+                            // Attempt to sign in the user
+                            val success = loginAccount(
+                                email = userEmail.value,
+                                password = userPassword.value
+                            )
+
+                            try {
+                                if (!success) {
+                                    Log.d("FAILED", "logfailed")
+                                    throw LoginFailedException()
+                                }
+                            } catch (e: Exception) {
+                                Log.d("Login", "Login failed")
+                                loginFailedDialog.value = true
+                            }
+
+                            // Navigate to main screen if login is successful
+                            navController.navigate(Screen.HomeScreen.route)
+                            Log.d("Login", "Logged in correctly")
+                        }
+                    } catch (e: RequiredFieldsAreEmptyException) {
+                        Log.d("Login", "Fields are empty")
+                        requiredFieldsAreEmptyDialog.value = true
+                    } catch (e: InvalidEmailException) {
+                        Log.d("Login", "Incorrect email")
+                        invalidEmailDialog.value = true
+                    } catch (e: Exception) {
+                        Log.d("LOGIN", e.toString())
+                    }
+                }
+            ) {
+                Text(text = "INICIAR SESIÓN", color = contentColor)
+            }
 
 
-    // dialog management
-    if (requiredFieldsAreEmptyDialog.value) {
-        CustomDismissDialog(
-            title = "Faltan campos",
-            message = "Debes rellenar todos los campos para continuar. "
-        ) {
-            requiredFieldsAreEmptyDialog.value = false
+
+            Spacer(modifier = Modifier.height(50.dp))
+
+            ClickableText(
+                modifier = Modifier.fillMaxHeight(.1f),
+                text = AnnotatedString("No tienes cuenta? Crea una aquí"),
+                onClick = { navController.navigate(Screen.RegisterScreen.route) },
+                style = TextStyle(
+                    textDecoration = TextDecoration.Underline, color = contentColor
+                )
+            )
+
         }
-    }
-    if (invalidEmailDialog.value) {
-        CustomDismissDialog(
-            title = "Email inválido",
-            message = "Por favor, introduce un email válido. ",
-            variable1 = userEmail,
-            variable2 = userPassword,
-        ) {
-            invalidEmailDialog.value = false
-        }
-    }
-    if (loginFailedDialog.value) {
-        CustomDismissDialog(
-            title = "Credenciales incorrectas",
-            message = "No existe ninguna cuenta con esas credenciales",
-            variable1 = userPassword
-        ) {
 
-        }
-    }
 
+        // dialog management
+        if (requiredFieldsAreEmptyDialog.value) {
+            CustomDismissDialog(
+                title = "Faltan campos",
+                message = "Debes rellenar todos los campos para continuar. "
+            ) {
+                requiredFieldsAreEmptyDialog.value = false
+            }
+        }
+        if (invalidEmailDialog.value) {
+            CustomDismissDialog(
+                title = "Email inválido",
+                message = "Por favor, introduce un email válido. ",
+                variable1 = userEmail,
+                variable2 = userPassword,
+            ) {
+                invalidEmailDialog.value = false
+            }
+        }
+        if (loginFailedDialog.value) {
+            CustomDismissDialog(
+                title = "Credenciales incorrectas",
+                message = "No existe ninguna cuenta con esas credenciales",
+                variable1 = userPassword
+            ) {
+
+            }
+        }
+
+    }
 }

@@ -7,12 +7,15 @@ import kotlinx.coroutines.tasks.await
 suspend fun createAccount(email: String, password: String): Boolean {
     return try {
         val result = Auth.auth.createUserWithEmailAndPassword(email, password).await()
+        addUserDataToCollection(email)
         true
     } catch (e: Exception) {
         Log.e("authError", "Error: ${e.message}", e)
         false
     }
 }
+
+
 
 suspend fun loginAccount(email: String, password: String): Boolean {
     return try {

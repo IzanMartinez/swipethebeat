@@ -8,10 +8,13 @@ import com.izamaralv.swipethebeat.screens.MainScreen
 import com.izamaralv.swipethebeat.screens.SettingsScreen
 import com.izamaralv.swipethebeat.screens.credentials.LoginScreen
 import com.izamaralv.swipethebeat.screens.credentials.RegisterScreen
+import com.izamaralv.swipethebeat.screens.lists.DislikeScreen
+import com.izamaralv.swipethebeat.screens.lists.LikeScreen
+import com.izamaralv.swipethebeat.screens.lists.ProfileScreen
 
 @Composable
 fun Navigation(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = Screen.SettingsScreen.route) {
+    NavHost(navController = navController, startDestination = Screen.HomeScreen.route) {
         composable(Screen.LoginScreen.route) {
             LoginScreen(navController)
         }
@@ -23,6 +26,18 @@ fun Navigation(navController: NavHostController) {
         }
         composable(Screen.HomeScreen.route) {
             MainScreen(navController = navController)
+        }
+        composable(Screen.ListsScreen.route) {
+            ProfileScreen(navController)
+        }
+        composable(Screen.LikeScreen.route) {
+            LikeScreen(navController)
+        }
+        composable(Screen.DislikeScreen.route) {
+            DislikeScreen(navController)
+        }
+        composable(Screen.ProfileScreen.route) {
+            ProfileScreen(navController)
         }
     }
 }

@@ -1,6 +1,5 @@
 package com.izamaralv.swipethebeat.screens.credentials
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,15 +42,13 @@ import com.izamaralv.swipethebeat.common.darkComponentColor
 import com.izamaralv.swipethebeat.common.lightComponentColor
 import com.izamaralv.swipethebeat.components.CustomDismissDialog
 import com.izamaralv.swipethebeat.exceptions.EmailAlreadyRegisteredException
-import com.izamaralv.swipethebeat.exceptions.InvalidEmailException
-import com.izamaralv.swipethebeat.exceptions.InvalidPasswordException
-import com.izamaralv.swipethebeat.exceptions.PasswordMatchErrorException
-import com.izamaralv.swipethebeat.exceptions.RequiredFieldsAreEmptyException
+import com.izamaralv.swipethebeat.exceptions.handler.handleException
 import com.izamaralv.swipethebeat.navigation.Screen
 import com.izamaralv.swipethebeat.utils.createAccount
-import com.izamaralv.swipethebeat.utils.isValidEmail
-import com.izamaralv.swipethebeat.utils.isValidPassword
+import com.izamaralv.swipethebeat.validators.validateFields
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun RegisterScreen(navController: NavController) {
@@ -216,41 +213,27 @@ fun RegisterScreen(navController: NavController) {
                 .background(color = darkComponentColor, shape = RoundedCornerShape(8.dp)),
             onClick = {
                 try {
-                    if (userEmail.value.isBlank() || userPassword.value.isBlank())
-                        throw RequiredFieldsAreEmptyException()
-                    if (!isValidEmail(email = userEmail.value))
-                        throw InvalidEmailException()
-                    if (!isValidPassword(password = userPassword.value))
-                        throw InvalidPasswordException()
-                    if (userPassword.value != userPasswordAgain.value)
-                        throw PasswordMatchErrorException()
+                    validateFields(userEmail.value, userPassword.value, userPasswordAgain.value)
                     coroutineScope.launch {
-                        isEmailNew.value = createAccount(
-                            email = userEmail.value,
-                            password = userPassword.value
-                        )
+                        val isEmailNew = withContext(Dispatchers.IO) {
+                            createAccount(email = userEmail.value, password = userPassword.value)
+                        }
+                        if (!isEmailNew) {
+                            throw EmailAlreadyRegisteredException()
+                        }
+                        navController.navigate(Screen.HomeScreen.route)
                     }
-                    if (!isEmailNew.value)
-                        throw EmailAlreadyRegisteredException()
-                    Log.d("SignIn", "Signed in correctly")
-                } catch (e: RequiredFieldsAreEmptyException) {
-                    Log.d("SignIn", "Fields are empty")
-                    requiredFieldsAreEmptyDialog.value = true
-                } catch (e: InvalidEmailException) {
-                    Log.d("SingIn", "Incorrect email")
-                    invalidEmailDialog.value = true
-                } catch (e: InvalidPasswordException) {
-                    Log.d("SingIn", "Incorrect password")
-                    invalidPasswordDialog.value = true
-                } catch (e: PasswordMatchErrorException) {
-                    Log.d("SingIn", "Passwords don't match")
-                    passwordMatchErrorDialog.value = true
-                } catch (e: EmailAlreadyRegisteredException) {
-                    Log.d("createAccount", "Email already registered")
-                    emailAlreadyRegisteredDialog.value = true
+                } catch (e: Exception) {
+                    handleException(
+                        e,
+                        requiredFieldsAreEmptyDialog,
+                        invalidEmailDialog,
+                        invalidPasswordDialog,
+                        passwordMatchErrorDialog,
+                        emailAlreadyRegisteredDialog
+                        )
                 }
 
-                navController.navigate(Screen.HomeScreen.route)
 
             }) {
             Text(text = "CREAR CUENTA", color = contentColor)

@@ -37,16 +37,16 @@ import com.izamaralv.swipethebeat.ui.theme.OrangeContent
 import com.izamaralv.swipethebeat.ui.theme.OrangeDarkComponent
 import com.izamaralv.swipethebeat.ui.theme.OrangeLightComponent
 import com.izamaralv.swipethebeat.ui.theme.OrangeName
+import com.izamaralv.swipethebeat.ui.theme.PurpleBackground
+import com.izamaralv.swipethebeat.ui.theme.PurpleContent
+import com.izamaralv.swipethebeat.ui.theme.PurpleDarkComponent
+import com.izamaralv.swipethebeat.ui.theme.PurpleLightComponent
+import com.izamaralv.swipethebeat.ui.theme.PurpleName
 import com.izamaralv.swipethebeat.ui.theme.RedBackground
 import com.izamaralv.swipethebeat.ui.theme.RedContent
 import com.izamaralv.swipethebeat.ui.theme.RedDarkComponent
 import com.izamaralv.swipethebeat.ui.theme.RedLightComponent
 import com.izamaralv.swipethebeat.ui.theme.RedName
-import com.izamaralv.swipethebeat.ui.theme.YellowBackground
-import com.izamaralv.swipethebeat.ui.theme.YellowContent
-import com.izamaralv.swipethebeat.ui.theme.YellowDarkComponent
-import com.izamaralv.swipethebeat.ui.theme.YellowLightComponent
-import com.izamaralv.swipethebeat.ui.theme.YellowName
 
 fun changeTheme(theme: String) {
     // colors
@@ -89,6 +89,14 @@ fun changeTheme(theme: String) {
             colorName = RedName
         }
 
+        PurpleName -> {
+            backgroundColor = PurpleBackground
+            darkComponentColor = PurpleDarkComponent
+            lightComponentColor = PurpleLightComponent
+            contentColor = PurpleContent
+            colorName = PurpleName
+        }
+
         LightName -> {
             backgroundColor = LightBackground
             darkComponentColor = LightDarkComponent
@@ -105,13 +113,7 @@ fun changeTheme(theme: String) {
             colorName = DarkName
         }
 
-        YellowName -> {
-            backgroundColor = YellowBackground
-            darkComponentColor = YellowDarkComponent
-            lightComponentColor = YellowLightComponent
-            contentColor = YellowContent
-            colorName = YellowName
-        }
+
 
         HighContrastName -> {
             backgroundColor = HighContrastBackground

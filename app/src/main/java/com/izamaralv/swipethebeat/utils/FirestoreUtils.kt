@@ -7,6 +7,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.toObject
 import com.izamaralv.swipethebeat.common.Constants.SONGS
+import com.izamaralv.swipethebeat.common.Constants.USERS
 import com.izamaralv.swipethebeat.common.Constants.getLikeList
 import com.izamaralv.swipethebeat.data.entities.Song
 import kotlinx.coroutines.tasks.await
@@ -106,9 +107,26 @@ suspend fun getSongIfDislike(genero: String): Song? {
             }
         } while (isRepe)
     } catch (e: FirebaseFirestoreException) {
-        Log.d("", ": ${e.message}")
+        Log.d("FIREBASE", ": ${e.message}")
     }
     return song
+}
+
+fun addUserDataToCollection(email: String) {
+    val db = FirebaseFirestore.getInstance()
+    val userData = hashMapOf(
+        "email" to email,
+        "lista_si" to listOf<String>(),
+        "lista_no" to listOf<String>(),
+        "nombre_de_usuario" to email.substringBefore("@")
+    )
+    try {
+        db.collection(USERS)
+            .add(userData)
+
+    } catch (e: FirebaseFirestoreException) {
+        Log.d("FIREBASE", ": ${e.message}")
+    }
 }
 
 private fun isSongInList(

@@ -3,6 +3,8 @@ package com.izamaralv.swipethebeat.navigation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Abc
 import androidx.compose.material.icons.filled.Audiotrack
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
@@ -22,7 +24,12 @@ sealed class Screen(
 
     object HomeScreen : Screen(route = "home_screen", title = "Settings", icon = Icons.Default.Home)
 
-    object SongListScreen : Screen(route = "song_list_screen", title = "Songs", icon = Icons.Default.Audiotrack)
+    object ListsScreen : Screen(route = "lists_screen", title = "Lists", Icons.Default.Audiotrack)
 
     object ProfileScreen : Screen(route = "profile_screen", title = "Profile", Icons.Default.Person)
+
+    object LikeScreen : Screen(route = "like_screen", title = "Like", Icons.Default.Check)
+
+    object DislikeScreen : Screen(route = "dislike_screen", title = "Dislike", Icons.Default.Clear)
+
 }

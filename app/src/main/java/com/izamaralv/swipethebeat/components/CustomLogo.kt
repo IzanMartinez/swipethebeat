@@ -1,12 +1,18 @@
 package com.izamaralv.swipethebeat.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
@@ -21,7 +27,7 @@ import com.izamaralv.swipethebeat.common.darkComponentColor
 import com.izamaralv.swipethebeat.common.lightComponentColor
 
 @Composable
-fun CustomLogo() {
+fun CustomReducedLogo() {
     // colors
     val backgroundColor by backgroundColor
     val darkComponentColor by darkComponentColor
@@ -40,12 +46,46 @@ fun CustomLogo() {
 }
 
 @Composable
+fun CustomLogo() {
+    val contentColor by contentColor
+    val lightComponentColor by lightComponentColor
+
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(250.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
+    ) {
+        Spacer(modifier = Modifier.height(60.dp))
+
+        // title box
+        Box(
+            modifier = Modifier.background(
+                color = Color.White.copy(alpha = .5f), shape = RoundedCornerShape(8.dp)
+            )
+        ) {
+            Text(
+                text = " S W I P E \n\n T H E \n\n B E A T ",
+                fontSize = 40.sp,
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight.ExtraBold,
+                color = contentColor,
+                modifier = Modifier.padding(20.dp),
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+@Composable
 fun CustomLogoInBox() {
     Box(
         modifier = Modifier.background(
             color = Color.White.copy(alpha = .5f), shape = RoundedCornerShape(8.dp)
         )
     ) {
-        CustomLogo()
+        CustomReducedLogo()
     }
 }

@@ -84,7 +84,7 @@ fun MainScreen(
 
     val data = dataViewModel.songs.value
 
-
+    /* TODO: only populate once */
     populateDisplayList()
     val startingNumber = if (/* getDisplayList().isEmpty() || */data.isEmpty()) {
         0

@@ -11,6 +11,7 @@ object Constants {
     )
 
     const val SONGS = "canciones"
+    const val USERS = "usuarios"
 
     private val likeList = mutableListOf<Song>()
     private val dislikeList = mutableListOf<Song>()
@@ -43,6 +44,12 @@ object Constants {
     }
     fun deleteSongDisplayList(song: Song) {
         displayList.remove(song)
+    }
+    fun deleteSongLikeList(song: Song) {
+        likeList.remove(song)
+    }
+    fun deleteSongDislikeList(song: Song) {
+        dislikeList.remove(song)
     }
     fun clearLikeList() {
         likeList.clear()

@@ -46,14 +46,15 @@ import com.izamaralv.swipethebeat.common.darkComponentColor
 import com.izamaralv.swipethebeat.common.lightComponentColor
 import com.izamaralv.swipethebeat.components.CustomDrawerSheet
 import com.izamaralv.swipethebeat.components.CustomLogoInBox
+import com.izamaralv.swipethebeat.navigation.Screen
 import com.izamaralv.swipethebeat.ui.theme.BlueName
 import com.izamaralv.swipethebeat.ui.theme.DarkName
 import com.izamaralv.swipethebeat.ui.theme.GreenName
 import com.izamaralv.swipethebeat.ui.theme.HighContrastName
 import com.izamaralv.swipethebeat.ui.theme.LightName
 import com.izamaralv.swipethebeat.ui.theme.OrangeName
+import com.izamaralv.swipethebeat.ui.theme.PurpleName
 import com.izamaralv.swipethebeat.ui.theme.RedName
-import com.izamaralv.swipethebeat.ui.theme.YellowName
 import com.izamaralv.swipethebeat.utils.changeTheme
 import kotlinx.coroutines.launch
 
@@ -68,7 +69,8 @@ fun SettingsScreen(navController: NavController) {
     val colorName by colorName
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val dismissDialogState = remember { mutableStateOf(false) }
+    val resetListsDialogState = remember { mutableStateOf(false) }
+    val logoutDialogState = remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     var expandedColor by remember { mutableStateOf(false) }
     var recompositionTrigger by remember { mutableIntStateOf(0) }
@@ -210,12 +212,12 @@ fun SettingsScreen(navController: NavController) {
 
                                 }
                             )
-                            // yellow
+                            // purple
                             DropdownMenuItem(
-                                text = { Text(text = YellowName, color = contentColor) },
+                                text = { Text(text = PurpleName, color = contentColor) },
                                 onClick = {
                                     expandedColor = false
-                                    changeTheme(YellowName)
+                                    changeTheme(PurpleName)
                                 }
                             )
                             // light
@@ -254,18 +256,43 @@ fun SettingsScreen(navController: NavController) {
                         }
                     }
                 }
-                Row {
-                    Text(text = "Resetear listas",
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp)
+                ) {
+                    Text(
+                        text = "Resetear listas",
                         modifier = Modifier
                             .clickable {
-                                dismissDialogState.value = true
-                            })
+                                resetListsDialogState.value = true
+                            }
+                            .padding(top = 15.dp),
+                        color = contentColor,
+                        fontSize = 25.sp,
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp)
+                ) {
+                    Text(
+                        text = "Cerrar sesión",
+                        modifier = Modifier
+                            .clickable {
+                                logoutDialogState.value = true
+                            }
+                            .padding(top = 15.dp),
+                        color = contentColor,
+                        fontSize = 25.sp,
+                    )
                 }
             }
         }
     }
 
-    if (dismissDialogState.value) {
+    if (resetListsDialogState.value) {
         AlertDialog(
             title = { Text("Alerta") },
             text = { Text("¿Estás seguro de que quieres resetear tus listas?") },
@@ -275,10 +302,10 @@ fun SettingsScreen(navController: NavController) {
             titleContentColor = contentColor,
             onDismissRequest = { /* do nothing */ },
             confirmButton = {
-                /* TODO: Ir a ajustes */
                 TextButton(
                     onClick = {
                         resetLists()
+                        resetListsDialogState.value = false
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = lightComponentColor,
@@ -291,13 +318,55 @@ fun SettingsScreen(navController: NavController) {
             },
             dismissButton = {
                 TextButton(
-                    onClick = { dismissDialogState.value = false },
+                    onClick = { resetListsDialogState.value = false },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = lightComponentColor,
                         contentColor = contentColor
                     )
                 ) {
-                    Text(text = "No")
+                    Text(
+                        text = "No",
+                    )
+                }
+            },
+        )
+
+    }
+    if (logoutDialogState.value) {
+        AlertDialog(
+            title = { Text("Alerta") },
+            text = { Text("¿Estás seguro de que quieres cerrar sesión?") },
+            containerColor = darkComponentColor,
+            textContentColor = contentColor,
+            iconContentColor = contentColor,
+            titleContentColor = contentColor,
+            onDismissRequest = { /* do nothing */ },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        navController.navigate(Screen.LoginScreen.route)
+                        resetListsDialogState.value = false
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = lightComponentColor,
+                        contentColor = contentColor
+                    )
+                ) {
+                    Text(text = "Si")
+
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { resetListsDialogState.value = false },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = lightComponentColor,
+                        contentColor = contentColor
+                    )
+                ) {
+                    Text(
+                        text = "No",
+                    )
                 }
             },
         )

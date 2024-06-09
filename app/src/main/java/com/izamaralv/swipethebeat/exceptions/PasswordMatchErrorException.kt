@@ -1,5 +1,5 @@
 package com.izamaralv.swipethebeat.exceptions
 
-class PasswordMatchErrorException : Throwable() {
+class PasswordMatchErrorException : Exception() {
 
 }
