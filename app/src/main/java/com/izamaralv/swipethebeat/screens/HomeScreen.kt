@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,11 +45,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.izamaralv.swipethebeat.common.Constants
-import com.izamaralv.swipethebeat.common.Constants.addSongDislikeList
-import com.izamaralv.swipethebeat.common.Constants.addSongLikeList
-import com.izamaralv.swipethebeat.common.Constants.deleteSongDisplayList
-import com.izamaralv.swipethebeat.common.Constants.getDisplayList
-import com.izamaralv.swipethebeat.common.Constants.populateDisplayList
 import com.izamaralv.swipethebeat.common.backgroundColor
 import com.izamaralv.swipethebeat.common.colorName
 import com.izamaralv.swipethebeat.common.contentColor
@@ -59,6 +55,11 @@ import com.izamaralv.swipethebeat.components.CustomLogoInBox
 import com.izamaralv.swipethebeat.data.entities.Song
 import com.izamaralv.swipethebeat.model.DataViewModel
 import com.izamaralv.swipethebeat.navigation.Screen
+import com.izamaralv.swipethebeat.utils.addSongToUserDislikeList
+import com.izamaralv.swipethebeat.utils.addSongToUserLikeList
+import com.izamaralv.swipethebeat.utils.deleteSongFromUserDisplayList
+import com.izamaralv.swipethebeat.utils.getDisplayListFromUser
+import com.izamaralv.swipethebeat.utils.getEmail
 import com.izamaralv.swipethebeat.utils.getSongByDifferentGender
 import com.izamaralv.swipethebeat.utils.getSongByGender
 import com.izamaralv.swipethebeat.utils.navigateToUrl
@@ -66,8 +67,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun MainScreen(
-    navController: NavController,
-    dataViewModel: DataViewModel = viewModel()
+    navController: NavController, dataViewModel: DataViewModel = viewModel()
 ) {
     // colors
     val backgroundColor by backgroundColor
@@ -80,21 +80,52 @@ fun MainScreen(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
+    val email: String? = getEmail()
+
     var selectedScreen = remember { mutableStateOf(Constants.SCREENS[0]) }
 
-    val data = dataViewModel.songs.value
-
-    /* TODO: only populate once */
-    populateDisplayList()
-    val startingNumber = if (/* getDisplayList().isEmpty() || */data.isEmpty()) {
-        0
-    } else {
-        data.indices.random()
-    }
+    val displayList = remember { mutableStateOf(listOf<Song>()) }
     val currentSong = remember { mutableStateOf<Song?>(null) }
+    val coroutineScope = rememberCoroutineScope()
+
     var areMoreSongs by remember { mutableStateOf(true) }
-    if (getDisplayList().isNotEmpty()) {
-        currentSong.value = getDisplayList()[startingNumber]
+
+    LaunchedEffect(Unit) {
+        getEmail()?.let { email ->
+            displayList.value = getDisplayListFromUser(email)
+            if (displayList.value.isNotEmpty()) {
+                currentSong.value = displayList.value.random()
+            } else {
+                areMoreSongs = false
+            }
+        }
+    }
+
+    fun updateDisplayListLike() {
+        coroutineScope.launch {
+            if (email != null) {
+                displayList.value = getDisplayListFromUser(email)
+                if (displayList.value.isNotEmpty()) {
+                    currentSong.value = currentSong.value?.let { getSongByGender(email, it.genero) }
+                } else {
+                    areMoreSongs = false
+                }
+            }
+        }
+    }
+
+    fun updateDisplayListDislike() {
+        coroutineScope.launch {
+            if (email != null) {
+                displayList.value = getDisplayListFromUser(email)
+                if (displayList.value.isNotEmpty()) {
+                    currentSong.value =
+                        currentSong.value?.let { getSongByDifferentGender(email, it.genero) }
+                } else {
+                    areMoreSongs = false
+                }
+            }
+        }
     }
 
     if (areMoreSongs) {
@@ -108,19 +139,15 @@ fun MainScreen(
             ModalNavigationDrawer(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(backgroundColor),
-                drawerContent = {
-
+                    .background(backgroundColor), drawerContent = {
                     CustomDrawerSheet(
                         navController = navController,
                         drawerState = drawerState,
                         scope = scope,
                         backgroundColor = darkComponentColor
                     )
-                },
-                drawerState = drawerState,
-
-                ) {
+                }, drawerState = drawerState
+            ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -153,8 +180,7 @@ fun MainScreen(
                         modifier = Modifier.align(Alignment.CenterVertically),
                         contentAlignment = Alignment.Center
                     ) {
-                        IconButton(
-                            onClick = { navController.navigate(Screen.SettingsScreen.route) }) {
+                        IconButton(onClick = { navController.navigate(Screen.SettingsScreen.route) }) {
                             Icon(
                                 Icons.Default.Settings,
                                 contentDescription = null,
@@ -171,7 +197,6 @@ fun MainScreen(
                         .padding(top = 190.dp, start = 20.dp, end = 20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
-
                 ) {
                     // imagen del álbum actual
                     Image(
@@ -180,21 +205,23 @@ fun MainScreen(
                             .size(300.dp)
                             .clickable {
                                 currentSong.value?.link?.let {
-                                    navigateToUrl(
-                                        context,
-                                        it
-                                    )
+                                    navigateToUrl(context, it)
                                 }
                             },
-                        contentDescription = "Portada del álbum",
-
-                        )
+                        contentDescription = "Portada del álbum"
+                    )
                     Text(
                         text = "\n" + currentSong.value?.nombre,
                         fontSize = 35.sp,
                         fontWeight = FontWeight.Bold,
                         color = contentColor,
-                        modifier = Modifier.heightIn(min = 50.dp),
+                        modifier = Modifier
+                            .heightIn(min = 50.dp)
+                            .clickable {
+                                currentSong.value?.link?.let {
+                                    navigateToUrl(context, it)
+                                }
+                            },
                         maxLines = 2
                     )
                     Text(
@@ -215,29 +242,25 @@ fun MainScreen(
                     Row(
                         modifier = Modifier
                             .padding(top = 60.dp, start = 50.dp, end = 50.dp)
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                            .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         // botón si
                         IconButton(
                             onClick = {
-                                currentSong.value?.let { addSongLikeList(it) }
-                                if (getDisplayList().size > 1) {
-                                    currentSong.value?.let { deleteSongDisplayList(it) }
-                                    currentSong.value =
-                                        currentSong.value?.let { getSongByGender(it.genero) }
-                                            ?: getSongByDifferentGender(
-                                                currentSong.value?.genero!!
-                                            )
-                                } else {
-
-                                    areMoreSongs = false
+                                coroutineScope.launch {
+                                    getEmail()?.let { email ->
+                                        deleteSongFromUserDisplayList(email, currentSong.value!!)
+                                        addSongToUserLikeList(email, currentSong.value!!)
+                                    }
+                                    if (displayList.value.size > 1) {
+                                        updateDisplayListLike()
+                                    } else {
+                                        areMoreSongs = false
+                                    }
                                 }
-                            },
-                            modifier = Modifier
+                            }, modifier = Modifier
                                 .background(
-                                    color = lightComponentColor,
-                                    shape = RoundedCornerShape(100.dp)
+                                    color = lightComponentColor, shape = RoundedCornerShape(100.dp)
                                 )
                                 .size(70.dp)
                         ) {
@@ -252,23 +275,20 @@ fun MainScreen(
                         // botón no
                         IconButton(
                             onClick = {
-                                currentSong.value?.let { addSongDislikeList(it) }
-                                if (getDisplayList().size > 1) {
-                                    currentSong.value?.let { deleteSongDisplayList(it) }
-                                    currentSong.value =
-                                        currentSong.value?.let { getSongByDifferentGender(it.genero) }
-                                            ?: getSongByGender(
-                                                currentSong.value?.genero!!
-                                            )
-                                } else {
-
-                                    areMoreSongs = false
+                                coroutineScope.launch {
+                                    getEmail()?.let { email ->
+                                        deleteSongFromUserDisplayList(email, currentSong.value!!)
+                                        addSongToUserDislikeList(email, currentSong.value!!)
+                                    }
+                                    if (displayList.value.size > 1) {
+                                        updateDisplayListDislike()
+                                    } else {
+                                        areMoreSongs = false
+                                    }
                                 }
-                            },
-                            modifier = Modifier
+                            }, modifier = Modifier
                                 .background(
-                                    color = lightComponentColor,
-                                    shape = RoundedCornerShape(100.dp)
+                                    color = lightComponentColor, shape = RoundedCornerShape(100.dp)
                                 )
                                 .size(70.dp)
                         ) {
@@ -278,11 +298,9 @@ fun MainScreen(
                                 tint = Color.Red,
                                 modifier = Modifier.size(50.dp)
                             )
-
                         }
                     }
                 }
-
             }
         }
     } else {
@@ -293,38 +311,39 @@ fun MainScreen(
         ) { }
     }
     if (!areMoreSongs) {
-        AlertDialog(
-            title = { Text("No hay más canciones") },
+        AlertDialog(title = { Text("No hay más canciones") },
             text = { Text("¿Dónde quieres ir?") },
             containerColor = darkComponentColor,
             textContentColor = contentColor,
             iconContentColor = contentColor,
             titleContentColor = contentColor,
-            onDismissRequest = { /* do nothing */ },
+            onDismissRequest = { },
             confirmButton = {
                 TextButton(
                     onClick = { navController.navigate(Screen.SettingsScreen.route) },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = lightComponentColor,
-                        contentColor = contentColor
+                        containerColor = lightComponentColor, contentColor = contentColor
                     )
                 ) {
                     Text(text = "Ajustes")
-
                 }
             },
-            dismissButton = { /*TODO*/
+            dismissButton = {
                 TextButton(
-                    onClick = { /*TODO*/ },
+                    onClick = { navController.navigate(Screen.ProfileScreen.route) },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = lightComponentColor,
-                        contentColor = contentColor
+                        containerColor = lightComponentColor, contentColor = contentColor
                     )
                 ) {
                     Text(text = "Perfil")
                 }
-            },
-        )
-
+            })
     }
 }
+
+
+
+
+
+
+

@@ -29,6 +29,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.izamaralv.swipethebeat.common.backgroundColor
 import com.izamaralv.swipethebeat.common.colorName
@@ -39,16 +40,17 @@ import com.izamaralv.swipethebeat.components.CustomDismissDialog
 import com.izamaralv.swipethebeat.components.CustomLogo
 import com.izamaralv.swipethebeat.exceptions.InvalidEmailException
 import com.izamaralv.swipethebeat.exceptions.InvalidPasswordException
-import com.izamaralv.swipethebeat.exceptions.LoginFailedException
 import com.izamaralv.swipethebeat.exceptions.RequiredFieldsAreEmptyException
+import com.izamaralv.swipethebeat.model.DataViewModel
 import com.izamaralv.swipethebeat.navigation.Screen
 import com.izamaralv.swipethebeat.utils.isValidEmail
 import com.izamaralv.swipethebeat.utils.isValidPassword
-import com.izamaralv.swipethebeat.utils.loginAccount
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoginScreen(navController: NavController) {
+fun LoginScreen(
+    navController: NavController, dataViewModel: DataViewModel = viewModel()
+) {
     // colors
     val backgroundColor by backgroundColor
     val darkComponentColor by darkComponentColor
@@ -136,42 +138,39 @@ fun LoginScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(70.dp))
 
-            Button(
-                colors = ButtonDefaults.buttonColors(darkComponentColor),
+            Button(colors = ButtonDefaults.buttonColors(darkComponentColor),
                 modifier = Modifier
                     .fillMaxWidth(.5f)
                     .height(55.dp)
                     .background(color = darkComponentColor, shape = RoundedCornerShape(8.dp)),
                 onClick = {
                     try {
-                        if (userEmail.value.isBlank() || userPassword.value.isBlank())
-                            throw RequiredFieldsAreEmptyException()
+                        if (userEmail.value.isBlank() || userPassword.value.isBlank()) throw RequiredFieldsAreEmptyException()
 
-                        if (!isValidEmail(email = userEmail.value))
-                            throw InvalidEmailException()
+                        if (!isValidEmail(email = userEmail.value)) throw InvalidEmailException()
 
-                        if (!isValidPassword(password = userPassword.value))
-                            throw InvalidPasswordException()
+                        if (!isValidPassword(password = userPassword.value)) throw InvalidPasswordException()
 
                         coroutineScope.launch {
                             // Attempt to sign in the user
-                            val success = loginAccount(
-                                email = userEmail.value,
-                                password = userPassword.value
-                            )
-
-                            try {
-                                if (!success) {
-                                    Log.d("FAILED", "logfailed")
-                                    throw LoginFailedException()
-                                }
-                            } catch (e: Exception) {
-                                Log.d("Login", "Login failed")
-                                loginFailedDialog.value = true
+                            val success = dataViewModel.signInWithEmailPassword(
+                                email = userEmail.value, password = userPassword.value
+                            ) {
+                                navController.navigate(Screen.HomeScreen.route)
                             }
 
+//                            try {
+//                                if (!success) {
+//                                    Log.d("FAILED", "logfailed")
+//                                    throw LoginFailedException()
+//                                }
+//                            } catch (e: Exception) {
+//                                Log.d("Login", "Login failed")
+//                                loginFailedDialog.value = true
+//                            }
+
                             // Navigate to main screen if login is successful
-                            navController.navigate(Screen.HomeScreen.route)
+//                            navController.navigate(Screen.HomeScreen.route)
                             Log.d("Login", "Logged in correctly")
                         }
                     } catch (e: RequiredFieldsAreEmptyException) {
@@ -183,8 +182,7 @@ fun LoginScreen(navController: NavController) {
                     } catch (e: Exception) {
                         Log.d("LOGIN", e.toString())
                     }
-                }
-            ) {
+                }) {
                 Text(text = "INICIAR SESIÓN", color = contentColor)
             }
 

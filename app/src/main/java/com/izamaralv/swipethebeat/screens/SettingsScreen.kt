@@ -37,8 +37,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.izamaralv.swipethebeat.common.Constants.resetLists
 import com.izamaralv.swipethebeat.common.backgroundColor
 import com.izamaralv.swipethebeat.common.colorName
 import com.izamaralv.swipethebeat.common.contentColor
@@ -46,6 +46,7 @@ import com.izamaralv.swipethebeat.common.darkComponentColor
 import com.izamaralv.swipethebeat.common.lightComponentColor
 import com.izamaralv.swipethebeat.components.CustomDrawerSheet
 import com.izamaralv.swipethebeat.components.CustomLogoInBox
+import com.izamaralv.swipethebeat.model.DataViewModel
 import com.izamaralv.swipethebeat.navigation.Screen
 import com.izamaralv.swipethebeat.ui.theme.BlueName
 import com.izamaralv.swipethebeat.ui.theme.DarkName
@@ -59,7 +60,9 @@ import com.izamaralv.swipethebeat.utils.changeTheme
 import kotlinx.coroutines.launch
 
 @Composable
-fun SettingsScreen(navController: NavController) {
+fun SettingsScreen(
+    navController: NavController, dataViewModel: DataViewModel = viewModel()
+) {
 
     // colors
     val backgroundColor by backgroundColor
@@ -69,7 +72,6 @@ fun SettingsScreen(navController: NavController) {
     val colorName by colorName
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val resetListsDialogState = remember { mutableStateOf(false) }
     val logoutDialogState = remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     var expandedColor by remember { mutableStateOf(false) }
@@ -153,125 +155,115 @@ fun SettingsScreen(navController: NavController) {
                         modifier = Modifier.padding(top = 15.dp)
                     )
                     Box(Modifier.width(150.dp)) {
-                        Text(
-                            text = colorName,
+                        Text(text = colorName,
                             color = contentColor,
                             fontSize = 25.sp,
                             modifier = Modifier
                                 .clickable { expandedColor = true }
                                 .background(darkComponentColor)
                                 .padding(16.dp)
-                                .fillMaxWidth()
-                        )
+                                .fillMaxWidth())
                         DropdownMenu(
                             expanded = expandedColor,
                             onDismissRequest = { expandedColor = false },
                             modifier = Modifier.background(darkComponentColor)
                         ) {
                             // green
-                            DropdownMenuItem(
-                                text = { Text(text = GreenName, color = contentColor) },
-                                onClick = {
-                                    expandedColor = false
-                                    changeTheme(GreenName)
+                            DropdownMenuItem(text = {
+                                Text(
+                                    text = GreenName,
+                                    color = contentColor
+                                )
+                            }, onClick = {
+                                expandedColor = false
+                                changeTheme(GreenName)
 
-                                    recompositionTrigger++ // Trigger recomposition
+                                recompositionTrigger++ // Trigger recomposition
 
-                                }
-                            )
+                            })
                             // blue
-                            DropdownMenuItem(
-                                text = { Text(text = BlueName, color = contentColor) },
+                            DropdownMenuItem(text = { Text(text = BlueName, color = contentColor) },
                                 onClick = {
                                     expandedColor = false
                                     changeTheme(BlueName)
 
                                     recompositionTrigger++ // Trigger recomposition
 
-                                }
-                            )
+                                })
                             // orange
-                            DropdownMenuItem(
-                                text = { Text(text = OrangeName, color = contentColor) },
+                            DropdownMenuItem(text = {
+                                Text(
+                                    text = OrangeName,
+                                    color = contentColor
+                                )
+                            },
                                 onClick = {
                                     expandedColor = false
                                     changeTheme(OrangeName)
 
                                     recompositionTrigger++ // Trigger recomposition
 
-                                }
-                            )
+                                })
                             // red
-                            DropdownMenuItem(
-                                text = { Text(text = RedName, color = contentColor) },
+                            DropdownMenuItem(text = { Text(text = RedName, color = contentColor) },
                                 onClick = {
                                     expandedColor = false
                                     changeTheme(RedName)
 
                                     recompositionTrigger++ // Trigger recomposition
 
-                                }
-                            )
+                                })
                             // purple
-                            DropdownMenuItem(
-                                text = { Text(text = PurpleName, color = contentColor) },
+                            DropdownMenuItem(text = {
+                                Text(
+                                    text = PurpleName,
+                                    color = contentColor
+                                )
+                            },
                                 onClick = {
                                     expandedColor = false
                                     changeTheme(PurpleName)
-                                }
-                            )
+                                })
                             // light
-                            DropdownMenuItem(
-                                text = { Text(text = LightName, color = contentColor) },
-                                onClick = {
-                                    expandedColor = false
-                                    changeTheme(LightName)
+                            DropdownMenuItem(text = {
+                                Text(
+                                    text = LightName,
+                                    color = contentColor
+                                )
+                            }, onClick = {
+                                expandedColor = false
+                                changeTheme(LightName)
 
-                                    recompositionTrigger++ // Trigger recomposition
+                                recompositionTrigger++ // Trigger recomposition
 
-                                }
-                            )
+                            })
                             // dark
-                            DropdownMenuItem(
-                                text = { Text(text = DarkName, color = contentColor) },
+                            DropdownMenuItem(text = { Text(text = DarkName, color = contentColor) },
                                 onClick = {
                                     expandedColor = false
                                     changeTheme(DarkName)
 
                                     recompositionTrigger++ // Trigger recomposition
 
-                                }
-                            )
+                                })
                             // high contrast
-                            DropdownMenuItem(
-                                text = { Text(text = HighContrastName, color = contentColor) },
+                            DropdownMenuItem(text = {
+                                Text(
+                                    text = HighContrastName,
+                                    color = contentColor
+                                )
+                            },
                                 onClick = {
                                     expandedColor = false
                                     changeTheme(HighContrastName)
 
                                     recompositionTrigger++ // Trigger recomposition
-                                }
-                            )
+                                })
 
                         }
                     }
                 }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp)
-                ) {
-                    Text(
-                        text = "Resetear listas",
-                        modifier = Modifier
-                            .clickable {
-                                resetListsDialogState.value = true
-                            }
-                            .padding(top = 15.dp),
-                        color = contentColor,
-                        fontSize = 25.sp,
-                    )
-                }
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -292,46 +284,7 @@ fun SettingsScreen(navController: NavController) {
         }
     }
 
-    if (resetListsDialogState.value) {
-        AlertDialog(
-            title = { Text("Alerta") },
-            text = { Text("¿Estás seguro de que quieres resetear tus listas?") },
-            containerColor = darkComponentColor,
-            textContentColor = contentColor,
-            iconContentColor = contentColor,
-            titleContentColor = contentColor,
-            onDismissRequest = { /* do nothing */ },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        resetLists()
-                        resetListsDialogState.value = false
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = lightComponentColor,
-                        contentColor = contentColor
-                    )
-                ) {
-                    Text(text = "Si")
 
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = { resetListsDialogState.value = false },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = lightComponentColor,
-                        contentColor = contentColor
-                    )
-                ) {
-                    Text(
-                        text = "No",
-                    )
-                }
-            },
-        )
-
-    }
     if (logoutDialogState.value) {
         AlertDialog(
             title = { Text("Alerta") },
@@ -344,12 +297,11 @@ fun SettingsScreen(navController: NavController) {
             confirmButton = {
                 TextButton(
                     onClick = {
+                        dataViewModel.logOut()
+                        logoutDialogState.value = false
                         navController.navigate(Screen.LoginScreen.route)
-                        resetListsDialogState.value = false
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = lightComponentColor,
-                        contentColor = contentColor
+                    }, colors = ButtonDefaults.buttonColors(
+                        containerColor = lightComponentColor, contentColor = contentColor
                     )
                 ) {
                     Text(text = "Si")
@@ -358,10 +310,9 @@ fun SettingsScreen(navController: NavController) {
             },
             dismissButton = {
                 TextButton(
-                    onClick = { resetListsDialogState.value = false },
+                    onClick = { logoutDialogState.value = false },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = lightComponentColor,
-                        contentColor = contentColor
+                        containerColor = lightComponentColor, contentColor = contentColor
                     )
                 ) {
                     Text(

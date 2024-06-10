@@ -1,6 +1,7 @@
 package com.izamaralv.swipethebeat.utils
 
 import android.util.Log
+import com.google.firebase.auth.FirebaseAuth
 import com.izamaralv.swipethebeat.firebase.auth.Auth
 import kotlinx.coroutines.tasks.await
 
@@ -38,5 +39,11 @@ fun isValidPassword(password: String): Boolean {
     val passwordRegex = Regex("^(?=.*[A-Z])(?=.*\\d).{8,}$")
     return password.matches(passwordRegex)
 }
+
+fun getEmail(): String? {
+    val user = FirebaseAuth.getInstance().currentUser
+    return user?.email
+}
+
 
 

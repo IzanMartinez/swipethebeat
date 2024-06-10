@@ -5,16 +5,17 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.izamaralv.swipethebeat.screens.MainScreen
+import com.izamaralv.swipethebeat.screens.ProfileScreen
 import com.izamaralv.swipethebeat.screens.SettingsScreen
 import com.izamaralv.swipethebeat.screens.credentials.LoginScreen
 import com.izamaralv.swipethebeat.screens.credentials.RegisterScreen
 import com.izamaralv.swipethebeat.screens.lists.DislikeScreen
 import com.izamaralv.swipethebeat.screens.lists.LikeScreen
-import com.izamaralv.swipethebeat.screens.lists.ProfileScreen
+import com.izamaralv.swipethebeat.screens.lists.ListsScreen
 
 @Composable
 fun Navigation(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = Screen.HomeScreen.route) {
+    NavHost(navController = navController, startDestination = Screen.LoginScreen.route) {
         composable(Screen.LoginScreen.route) {
             LoginScreen(navController)
         }
@@ -28,7 +29,7 @@ fun Navigation(navController: NavHostController) {
             MainScreen(navController = navController)
         }
         composable(Screen.ListsScreen.route) {
-            ProfileScreen(navController)
+            ListsScreen(navController)
         }
         composable(Screen.LikeScreen.route) {
             LikeScreen(navController)

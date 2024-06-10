@@ -49,6 +49,7 @@ import com.izamaralv.swipethebeat.ui.theme.RedLightComponent
 import com.izamaralv.swipethebeat.ui.theme.RedName
 
 fun changeTheme(theme: String) {
+    /* TODO: change theme in database and from database */
     // colors
     var backgroundColor by backgroundColor
     var darkComponentColor by darkComponentColor

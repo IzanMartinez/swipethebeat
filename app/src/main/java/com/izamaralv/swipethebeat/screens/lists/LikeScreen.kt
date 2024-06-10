@@ -23,6 +23,7 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,10 +36,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.izamaralv.swipethebeat.common.Constants
-import com.izamaralv.swipethebeat.common.Constants.addSongDislikeList
-import com.izamaralv.swipethebeat.common.Constants.deleteSongLikeList
-import com.izamaralv.swipethebeat.common.Constants.getLikeList
 import com.izamaralv.swipethebeat.common.backgroundColor
 import com.izamaralv.swipethebeat.common.colorName
 import com.izamaralv.swipethebeat.common.contentColor
@@ -47,8 +44,13 @@ import com.izamaralv.swipethebeat.common.lightComponentColor
 import com.izamaralv.swipethebeat.components.CustomDrawerSheet
 import com.izamaralv.swipethebeat.components.CustomLogoInBox
 import com.izamaralv.swipethebeat.components.DefaultDivider
+import com.izamaralv.swipethebeat.data.entities.Song
 import com.izamaralv.swipethebeat.model.DataViewModel
 import com.izamaralv.swipethebeat.navigation.Screen
+import com.izamaralv.swipethebeat.utils.addSongToUserDislikeList
+import com.izamaralv.swipethebeat.utils.deleteSongFromUserLikeList
+import com.izamaralv.swipethebeat.utils.getEmail
+import com.izamaralv.swipethebeat.utils.getLikeListFromUser
 import com.izamaralv.swipethebeat.utils.navigateToUrl
 import kotlinx.coroutines.launch
 
@@ -65,10 +67,15 @@ fun LikeScreen(
     val colorName by colorName
 
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
 
-    // Usa un estado mutable para la lista de canciones
-    var likeList by remember { mutableStateOf(Constants.getLikeList()) }
+    var likeList by remember { mutableStateOf<List<Song>>(emptyList()) }
+    val email = getEmail()
+
+    LaunchedEffect(email) {
+        likeList = email?.let { getLikeListFromUser(it) }!!
+    }
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -148,7 +155,13 @@ fun LikeScreen(
                     items(likeList) { song ->
                         Row(
                             modifier = Modifier
-                                .fillMaxWidth(),
+                                .fillMaxWidth()
+                                .clickable {
+                                    navigateToUrl(
+                                        context,
+                                        song.link
+                                    )
+                                },
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -161,12 +174,6 @@ fun LikeScreen(
                                     fontWeight = FontWeight.Bold,
                                     modifier = Modifier
                                         .padding(start = 20.dp, top = 20.dp)
-                                        .clickable {
-                                            navigateToUrl(
-                                                context,
-                                                song.link
-                                            )
-                                        }
                                 )
                                 Text(
                                     text = song.album,
@@ -181,10 +188,14 @@ fun LikeScreen(
                             }
                             IconButton(
                                 onClick = {
-                                    // Elimina la canción de la lista y actualiza el estado
-                                    deleteSongLikeList(song)
-                                    addSongDislikeList(song)
-                                    likeList = getLikeList()
+                                    coroutineScope.launch {
+                                        if (email != null) {
+                                            deleteSongFromUserLikeList(email, song)
+                                            addSongToUserDislikeList(email, song)
+                                            likeList =
+                                                getLikeListFromUser(email)  // Update the likeList state
+                                        }
+                                    }
                                 },
                                 modifier = Modifier
                                     .padding(end = 20.dp, top = 20.dp)

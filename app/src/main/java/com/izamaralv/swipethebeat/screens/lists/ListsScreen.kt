@@ -44,7 +44,7 @@ import com.izamaralv.swipethebeat.navigation.Screen
 import kotlinx.coroutines.launch
 
 @Composable
-fun ProfileScreen(
+fun ListsScreen(
     navController: NavController,
     dataViewModel: DataViewModel = viewModel()
 ) {

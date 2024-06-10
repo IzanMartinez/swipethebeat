@@ -1,12 +1,11 @@
 package com.izamaralv.swipethebeat.utils
 
 import android.util.Log
-import com.izamaralv.swipethebeat.common.Constants.getDisplayList
 import com.izamaralv.swipethebeat.data.entities.Song
 
-fun getSongByGender(gender: String): Song? {
+suspend fun getSongByGender(email: String, gender: String): Song? {
     val songsByGender = mutableListOf<Song>()
-    for (song in getDisplayList()) {
+    for (song in getDisplayListFromUser(email)) {
         if (song.genero == gender) {
             songsByGender.add(song)
         }
@@ -15,9 +14,9 @@ fun getSongByGender(gender: String): Song? {
     return songsByGender.random()
 }
 
-fun getSongByDifferentGender(gender: String): Song? {
+suspend fun getSongByDifferentGender(email: String, gender: String): Song? {
     val songsByDifferentGender = mutableListOf<Song>()
-    for (song in getDisplayList()) {
+    for (song in getDisplayListFromUser(email)) {
         if (song.genero != gender) {
             songsByDifferentGender.add(song)
         }

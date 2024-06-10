@@ -23,6 +23,7 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,9 +36,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.izamaralv.swipethebeat.common.Constants.addSongLikeList
-import com.izamaralv.swipethebeat.common.Constants.deleteSongDislikeList
-import com.izamaralv.swipethebeat.common.Constants.getDislikeList
 import com.izamaralv.swipethebeat.common.backgroundColor
 import com.izamaralv.swipethebeat.common.colorName
 import com.izamaralv.swipethebeat.common.contentColor
@@ -46,8 +44,13 @@ import com.izamaralv.swipethebeat.common.lightComponentColor
 import com.izamaralv.swipethebeat.components.CustomDrawerSheet
 import com.izamaralv.swipethebeat.components.CustomLogoInBox
 import com.izamaralv.swipethebeat.components.DefaultDivider
+import com.izamaralv.swipethebeat.data.entities.Song
 import com.izamaralv.swipethebeat.model.DataViewModel
 import com.izamaralv.swipethebeat.navigation.Screen
+import com.izamaralv.swipethebeat.utils.addSongToUserLikeList
+import com.izamaralv.swipethebeat.utils.deleteSongFromUserDislikeList
+import com.izamaralv.swipethebeat.utils.getDislikeListFromUser
+import com.izamaralv.swipethebeat.utils.getEmail
 import com.izamaralv.swipethebeat.utils.navigateToUrl
 import kotlinx.coroutines.launch
 
@@ -65,9 +68,13 @@ fun DislikeScreen(
 
     val context = LocalContext.current
 
+    var dislikeList by remember { mutableStateOf<List<Song>>(emptyList()) }
+    val email = getEmail()
 
-    // Usa un estado mutable para la lista de canciones
-    var dislikeList by remember { mutableStateOf(getDislikeList()) }
+    LaunchedEffect(email) {
+        dislikeList = email?.let { getDislikeListFromUser(it) }!!
+    }
+    val coroutineScope = rememberCoroutineScope()
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -147,7 +154,13 @@ fun DislikeScreen(
                     items(dislikeList) { song ->
                         Row(
                             modifier = Modifier
-                                .fillMaxWidth(),
+                                .fillMaxWidth()
+                                .clickable {
+                                    navigateToUrl(
+                                        context,
+                                        song.link
+                                    )
+                                },
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -180,10 +193,14 @@ fun DislikeScreen(
                             }
                             IconButton(
                                 onClick = {
-                                    // Elimina la canción de la lista y actualiza el estado
-                                    deleteSongDislikeList(song)
-                                    addSongLikeList(song)
-                                    dislikeList = getDislikeList()
+                                    coroutineScope.launch {
+                                        if (email != null) {
+                                            deleteSongFromUserDislikeList(email, song)
+                                            addSongToUserLikeList(email, song)
+                                            dislikeList =
+                                                getDislikeListFromUser(email)  // Update the dislikeList state
+                                        }
+                                    }
                                 },
                                 modifier = Modifier
                                     .padding(end = 20.dp, top = 20.dp)
