@@ -299,6 +299,7 @@ fun SettingsScreen(
                     onClick = {
                         dataViewModel.logOut()
                         logoutDialogState.value = false
+                        changeTheme(GreenName)
                         navController.navigate(Screen.LoginScreen.route)
                     }, colors = ButtonDefaults.buttonColors(
                         containerColor = lightComponentColor, contentColor = contentColor
